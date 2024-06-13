@@ -86,9 +86,8 @@ def load_data(dataset):
     -------
     A: adjacency matrix 
     X: processed data
-    capacity: only works for NREL, each station's capacity
     '''
-    capacity = []
+
     if dataset == 'metr':
         A, X = load_metr_la_rdata()
         X = X[:,0,:]
@@ -108,7 +107,7 @@ def load_data(dataset):
     A_s = A[:, list(know_set)][list(know_set), :]      # get the observed adjacent matrix from the full adjacent matrix,
                                                     # the adjacent matrix are based on pairwise distance, 
                                                     # so we need not to construct it for each batch, we just use index to find the dynamic adjacent matrix  
-    return A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s,capacity     
+    return A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s     
 
 """
 Define the test error
@@ -120,7 +119,7 @@ def test_error(STmodel, unknow_set, test_data, A_s, Missing0):
     :test_data: The true value test_data of shape (test_num_timesteps, num_nodes)
     :A_s: The full adjacent matrix
     :Missing0: True: 0 in original datasets means missing data
-    :return: NAE, MAPE and RMSE
+    :return: MAE, MAPE and RMSE
     """  
     unknow_set = set(unknow_set)
     time_dim = STmodel.time_dimension

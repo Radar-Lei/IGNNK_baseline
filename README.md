@@ -1,3 +1,13 @@
+# IGNNK baseline
+This repository was forked from [IGNNK](https://github.com/Kaimaoge/IGNNK) and modified to work as one of the baselines for our study.
+
+
+
+
+
+
+
+# The following is the original readme
 # Inductive Graph Neural Networks for Spatiotemporal Kriging (IGNNK)
 
 This is the code corresponding to the experiments conducted for the AAAI 2021 paper "[Inductive Graph Neural Networks for Spatiotemporal Kriging](https://arxiv.org/abs/2006.07527)"

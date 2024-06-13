@@ -93,7 +93,13 @@ def test_error(STmodel, unknow_set, test_data, A_s, Missing0, device):
         A_h = torch.from_numpy((calculate_random_walk_matrix(A_s.T).T).astype('float32')).to(device)
         
         imputation = STmodel(T_inputs, A_q, A_h)
-        imputation = imputation.cuda().data.cpu().numpy()
+        if torch.cuda.is_available():
+            imputation = imputation.cuda().data.cpu().numpy()
+        elif torch.backends.mps.is_available():
+            imputation = imputation.cpu().data.numpy()
+        else:
+            imputation = imputation.data.numpy()
+
         o[i:i+time_dim, :] = imputation[0, :, :]
     
     if dataset == 'NREL':  
@@ -127,12 +133,20 @@ if __name__ == "__main__":
     K = 1
     n_m = 50
     n_u = 50
-    max_iter = 200
+    max_iter = 750
     learning_rate = 0.001
     E_maxvalue = 80
     batch_size = 4
     to_plot = True
-    device = torch.device("cuda:0")
+    if torch.cuda.is_available():
+        device = torch.device("cuda:0")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
+
+    for _ in range(100):
+        torch.matmul(torch.rand(500,500).to(device), torch.rand(500,500).to(device))
 
     save_path = "./result_best/k=%d_T=%d_Z=%d/%s/" % (K, h, z, dataset)
 
