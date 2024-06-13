@@ -260,7 +260,7 @@ if __name__ == "__main__":
     batch_size = flags.batch_size
     to_plot = flags.to_plot
     # load dataset
-    A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s,capacity = load_data(dataset)
+    A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s = load_data(dataset)
     # Define model
     STmodel = IGNNK(h, z, K)  # The graph neural networks
 
@@ -279,18 +279,13 @@ if __name__ == "__main__":
             
             inputs = np.array(feed_batch)
             inputs_omask = np.ones(np.shape(inputs))
-            if not dataset == 'NREL': 
-                inputs_omask[inputs == 0] = 0           # We found that there are irregular 0 values for METR-LA, so we treat those 0 values as missing data,
-                                                        # For other datasets, it is not necessary to mask 0 values
-                                                    
+
             missing_index = np.ones((inputs.shape))
             for j in range(batch_size):
                 missing_mask = random.sample(range(0,n_o_n_m),n_m) #Masked locations
                 missing_index[j, :, missing_mask] = 0
-            if dataset == 'NREL':
-                Mf_inputs = inputs * inputs_omask * missing_index / capacities[:, None]
-            else:
-                Mf_inputs = inputs * inputs_omask * missing_index / E_maxvalue #normalize the value according to experience
+
+            Mf_inputs = inputs * inputs_omask * missing_index / E_maxvalue #normalize the value according to experience
             Mf_inputs = torch.from_numpy(Mf_inputs.astype('float32'))
             mask = torch.from_numpy(inputs_omask.astype('float32'))   #The reconstruction errors on irregular 0s are not used for training
             
@@ -298,10 +293,7 @@ if __name__ == "__main__":
             A_q = torch.from_numpy((calculate_random_walk_matrix(A_dynamic).T).astype('float32'))
             A_h = torch.from_numpy((calculate_random_walk_matrix(A_dynamic.T).T).astype('float32'))
             
-            if dataset == 'NREL':
-                outputs = torch.from_numpy(inputs/capacities[:, None])
-            else:
-                outputs = torch.from_numpy(inputs/E_maxvalue) #The label
+            outputs = torch.from_numpy(inputs/E_maxvalue) #The label
             
             optimizer.zero_grad()
             X_res = STmodel(Mf_inputs, A_q, A_h)  #Obtain the reconstruction
