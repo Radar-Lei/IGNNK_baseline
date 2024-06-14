@@ -77,8 +77,35 @@ def load_pems7_1026_data():
     A = 1 - A
     A = A.astype(np.float32)
 
+    return A, X
 
+def load_seattle_data():
+    df_raw = pd.read_pickle('./dataset/Seattle/speed_matrix_2015') # (D*L_d, K)
+    # the sensor id's in data_arr_df actually has duplicated sensor ids
+    location_info = pd.read_csv('./dataset/Seattle/Cabinet Location Information.csv')
+    distance_df = pd.DataFrame({'SensorName': [col[1:] for col in df_raw.columns]})
+    dist_merged_df = pd.merge(distance_df, location_info[['CabName', 'Lat', 'Lon']], left_on='SensorName', right_on='CabName', how='left')
 
+    # drop the redundant 'CabName' column
+    dist_merged_df = dist_merged_df.drop('CabName', axis=1)
+    # Compute the adjacency matrix
+    A = np.zeros((len(dist_merged_df), len(dist_merged_df)))
+    for i in range(len(dist_merged_df)):
+        for j in range(i+1, len(dist_merged_df)):
+            lat1, lon1 = dist_merged_df.iloc[i]['Lat'], dist_merged_df.iloc[i]['Lon']
+            lat2, lon2 = dist_merged_df.iloc[j]['Lat'], dist_merged_df.iloc[j]['Lon']
+            
+            dist = haversine(lon1, lat1, lon2, lat2)
+            A[i,j] = dist
+            A[j,i] = dist
+
+    A = (A - A.min()) / (A.max() - A.min())
+    A = 1 - A
+    A = A.astype(np.float32)
+    X = df_raw.values.transpose((1, 0))
+    X = X.astype(np.float32)
+
+    return A, X
 
 def generate_nerl_data():
     # %% Obtain all the file names

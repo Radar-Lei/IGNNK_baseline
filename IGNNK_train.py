@@ -88,16 +88,15 @@ def load_data(dataset):
     capacity: only works for NREL, each station's capacity
     '''
     capacity = []
-    if dataset == 'metr':
-        A, X = load_metr_la_rdata()
-        X = X[:,0,:]
-    elif dataset == 'pems7_228':
+    if dataset == 'pems7_228':
         A, X = load_pems7_228_data()
-
-    elif dataset == 'pems':
-        A,X = load_pems_data()
+    elif dataset == 'pems7_1026':
+        A, X = load_pems7_1026_data()
+    elif dataset == 'seattle':
+        A, X = load_seattle_data()
     else:
-        raise NotImplementedError('Please specify datasets from: metr, nrel, ushcn, sedata or pems')
+        raise NotImplementedError('Please specify datasets from: pems7_228, pems7_1026, seattle')
+    
     split_line1 = int(X.shape[1] * 0.7)
     training_set = X[:,:split_line1].transpose()
     test_set = X[:, split_line1:].transpose()       # split the training and test period
@@ -268,7 +267,7 @@ if __name__ == "__main__":
     # training_set shape: (num_timesteps, full_num_nodes)
 
     A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s,capacity = load_data(dataset)
-
+    E_maxvalue = max(training_set.max(), test_set.max())
     # Define model
     STmodel = IGNNK(h, z, K)  # The graph neural networks
 

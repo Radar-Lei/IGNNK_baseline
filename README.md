@@ -1,11 +1,31 @@
 # IGNNK baseline
 This repository was forked from [IGNNK](https://github.com/Kaimaoge/IGNNK) and modified to work as one of the baselines for our study (Reference number: TRC-23-02333).
 
+First, you should download the data via [Google Drive](https://drive.google.com/drive/folders/14VPjNlQQRd5FCXXHrBPYbety9fiWx7--?usp=drive_link), and put each data set folder under the folder data/.
 
+Then, you can test IGNNK on these data sets with varying missing ratio using the following:
 
+For the PeMS7_228 data set,
 ```bash
-python IGNNK_train.py "metr" --missing_ratio 0.3 --n_locations 207 --h 24 --max_iter 750
+python IGNNK_train.py "pems7_228" --missing_ratio 0.3 --n_locations 228 --z 128 --h 24 --max_iter 1500
+python IGNNK_train.py "pems7_228" --missing_ratio 0.6 --n_locations 228 --z 128 --h 24 --max_iter 1500
+python IGNNK_train.py "pems7_228" --missing_ratio 0.75 --n_locations 228 --z 128 --h 24 --max_iter 1500
 ```
+
+For the PeMS7_1026 data set,
+```bash
+python IGNNK_train.py "pems7_228" --missing_ratio 0.3 --n_locations 1026 --z 256 --h 24 --max_iter 750
+python IGNNK_train.py "pems7_228" --missing_ratio 0.6 --n_locations 1026 --z 256 --h 24 --max_iter 750
+python IGNNK_train.py "pems7_228" --missing_ratio 0.75 --n_locations 1026 --z 256 --h 24 --max_iter 750
+```
+
+For the Seattle data set,
+```bash
+python IGNNK_train.py "pems7_228" --missing_ratio 0.3 --n_locations 228 --z 128 --h 24 --max_iter 1500
+python IGNNK_train.py "pems7_228" --missing_ratio 0.6 --n_locations 228 --z 128 --h 24 --max_iter 1500
+python IGNNK_train.py "pems7_228" --missing_ratio 0.75 --n_locations 228 --z 128 --h 24 --max_iter 1500
+```
+
 
 # The following is the original readme file
 # Inductive Graph Neural Networks for Spatiotemporal Kriging (IGNNK)
