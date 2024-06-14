@@ -100,7 +100,7 @@ def load_data(dataset):
     split_line1 = int(X.shape[1] * 0.7)
     training_set = X[:,:split_line1].transpose()
     test_set = X[:, split_line1:].transpose()       # split the training and test period
-    rand = np.random.RandomState(0) # Fixed random output
+    rand = np.random.RandomState(42) # Fixed random output, set it to the same value as in our study.
     unknow_set = rand.choice(list(range(0,X.shape[0])),n_u,replace=False)
     unknow_set = set(unknow_set)
     full_set = set(range(0,X.shape[0]))        
@@ -152,10 +152,7 @@ def test_error(STmodel, unknow_set, test_data, A_s, Missing0):
         imputation = imputation.data.numpy()
         o[i:i+time_dim, :] = imputation[0, :, :]
     
-    if dataset == 'NREL':  
-        o = o*capacities[None,:]
-    else:
-        o = o*E_maxvalue
+    o = o*E_maxvalue
     truth = test_inputs_s[0:test_set.shape[0]//time_dim*time_dim]
     o[missing_index_s[0:test_set.shape[0]//time_dim*time_dim] == 1] = truth[missing_index_s[0:test_set.shape[0]//time_dim*time_dim] == 1]
     
@@ -214,10 +211,8 @@ def rolling_test_error(STmodel, unknow_set, test_data, A_s, Missing0):
     truth = test_inputs_s[time_dim:test_set.shape[0]]
     o[missing_index_s[time_dim:test_set.shape[0]] == 1] = truth[missing_index_s[time_dim:test_set.shape[0]] == 1]
     
-    if dataset == 'NREL':  
-        o = o*capacities[None,:]
-    else:
-        o = o*E_maxvalue
+    o = o*E_maxvalue
+
     truth = test_inputs_s[0:test_set.shape[0]//time_dim*time_dim]
     test_mask =  1 - missing_index_s[time_dim:test_set.shape[0]]
     if Missing0 == True:
@@ -294,10 +289,8 @@ if __name__ == "__main__":
             for j in range(batch_size):
                 missing_mask = random.sample(range(0,n_o_n_m),n_m) #Masked locations
                 missing_index[j, :, missing_mask] = 0
-            if dataset == 'NREL':
-                Mf_inputs = inputs * inputs_omask * missing_index / capacities[:, None]
-            else:
-                Mf_inputs = inputs * inputs_omask * missing_index / E_maxvalue #normalize the value according to experience
+
+            Mf_inputs = inputs * inputs_omask * missing_index / E_maxvalue #normalize the value according to experience
             Mf_inputs = torch.from_numpy(Mf_inputs.astype('float32'))
             mask = torch.from_numpy(inputs_omask.astype('float32'))   #The reconstruction errors on irregular 0s are not used for training
             
@@ -305,10 +298,7 @@ if __name__ == "__main__":
             A_q = torch.from_numpy((calculate_random_walk_matrix(A_dynamic).T).astype('float32'))
             A_h = torch.from_numpy((calculate_random_walk_matrix(A_dynamic.T).T).astype('float32'))
             
-            if dataset == 'NREL':
-                outputs = torch.from_numpy(inputs/capacities[:, None])
-            else:
-                outputs = torch.from_numpy(inputs/E_maxvalue) #The label
+            outputs = torch.from_numpy(inputs/E_maxvalue) #The label
             
             optimizer.zero_grad()
             X_res = STmodel(Mf_inputs, A_q, A_h)  #Obtain the reconstruction
