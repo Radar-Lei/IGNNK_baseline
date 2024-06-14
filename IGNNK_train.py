@@ -30,8 +30,8 @@ def parse_args(args):
 
     # Requird input parametrs
     parser.add_argument(
-        'dataset',type=str,default='metr',
-        help = 'Name of the datasets, select from metr, nrel, ushcn, sedata or pems'
+        'dataset',type=str,default='pems7_228',
+        help = 'Name of the datasets, select from pems7_228, pems7_1026, seattle'
     )
     
     # optional input parameters
@@ -57,7 +57,7 @@ def parse_args(args):
         help='If using diffusion convolution, the actual diffusion convolution step is K+1'
     )
     parser.add_argument(
-        '--max_iter',type=int,default=750,
+        '--max_iter',type=int,default=1500,
         help='max training episode'
     )
     parser.add_argument(
