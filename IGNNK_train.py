@@ -36,9 +36,14 @@ def parse_args(args):
     
     # optional input parameters
     parser.add_argument(
-        '--n_o',type=int,default=150,
-        help='sampled space dimension'
+        '--missing_ratio',type=float,default=0.3,
+        help='missing_ratio'
     )
+    parser.add_argument(
+        '--n_locations',type=int,default=207,
+        help='the total number of locations'
+    )
+    
     parser.add_argument(
         '--h',type=int,default=24,
         help='sampled time dimension'
@@ -50,14 +55,6 @@ def parse_args(args):
     parser.add_argument(
         '--K',type=int,default=1,
         help='If using diffusion convolution, the actual diffusion convolution step is K+1'
-    )
-    parser.add_argument(
-        '--n_m',type=int,default=50,
-        help='number of mask node during training'
-    )
-    parser.add_argument(
-        '--n_u',type=int,default=50,
-        help='target locations, n_u locations will be deleted from the training data'
     )
     parser.add_argument(
         '--max_iter',type=int,default=750,
@@ -94,25 +91,6 @@ def load_data(dataset):
     if dataset == 'metr':
         A, X = load_metr_la_rdata()
         X = X[:,0,:]
-    elif dataset == 'nrel':
-        A, X , files_info = load_nerl_data()
-        #For Nrel, We only use 7:00am to 7:00pm as the target data, because otherwise the 0-values of periods without sunshine will greatly influence the results
-        time_used_base = np.arange(84,228)
-        time_used = np.array([])
-        for i in range(365):
-            time_used = np.concatenate((time_used,time_used_base + 24*12* i))
-        X=X[:,time_used.astype(np.int)]
-        capacities = np.array(files_info['capacity'])
-        capacities = capacities.astype('float32')
-    elif dataset == 'ushcn':
-        A,X,Omissing = load_udata()
-        X = X[:,:,:,0]
-        X = X.reshape(1218,120*12)
-        X = X/100
-    elif dataset == 'sedata':
-        A, X = load_sedata()
-        A = A.astype('float32')
-        X = X.astype('float32')
     elif dataset == 'pems':
         A,X = load_pems_data()
     else:
@@ -283,6 +261,8 @@ if __name__ == "__main__":
     batch_size = flags.batch_size
     to_plot = flags.to_plot
     # load dataset
+    # training_set shape: (num_timesteps, full_num_nodes)
+
     A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s,capacity = load_data(dataset)
     # Define model
     STmodel = IGNNK(h, z, K)  # The graph neural networks

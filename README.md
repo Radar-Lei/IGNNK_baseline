@@ -3,9 +3,9 @@ This repository was forked from [IGNNK](https://github.com/Kaimaoge/IGNNK) and m
 
 
 
-
-
-
+```bash
+python IGNNK_train.py "metr" --missing_ratio 0.3 --n_locations 207 --h 24 --max_iter 750
+```
 
 # The following is the original readme file
 # Inductive Graph Neural Networks for Spatiotemporal Kriging (IGNNK)
