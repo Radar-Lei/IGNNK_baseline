@@ -1,4 +1,5 @@
 from __future__ import division
+
 import torch
 import numpy as np
 import torch.optim as optim
@@ -26,6 +27,7 @@ def parse_args(args):
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="Parse argument used when training IGNNK model.",
         epilog="python IGNNK_train.py DATASET, for example: python IGNNK_train.py 'metr' ")
+
     # Requird input parametrs
     parser.add_argument(
         'dataset',type=str,default='metr',
@@ -86,11 +88,31 @@ def load_data(dataset):
     -------
     A: adjacency matrix 
     X: processed data
+    capacity: only works for NREL, each station's capacity
     '''
-
+    capacity = []
     if dataset == 'metr':
         A, X = load_metr_la_rdata()
         X = X[:,0,:]
+    elif dataset == 'nrel':
+        A, X , files_info = load_nerl_data()
+        #For Nrel, We only use 7:00am to 7:00pm as the target data, because otherwise the 0-values of periods without sunshine will greatly influence the results
+        time_used_base = np.arange(84,228)
+        time_used = np.array([])
+        for i in range(365):
+            time_used = np.concatenate((time_used,time_used_base + 24*12* i))
+        X=X[:,time_used.astype(np.int)]
+        capacities = np.array(files_info['capacity'])
+        capacities = capacities.astype('float32')
+    elif dataset == 'ushcn':
+        A,X,Omissing = load_udata()
+        X = X[:,:,:,0]
+        X = X.reshape(1218,120*12)
+        X = X/100
+    elif dataset == 'sedata':
+        A, X = load_sedata()
+        A = A.astype('float32')
+        X = X.astype('float32')
     elif dataset == 'pems':
         A,X = load_pems_data()
     else:
@@ -107,7 +129,7 @@ def load_data(dataset):
     A_s = A[:, list(know_set)][list(know_set), :]      # get the observed adjacent matrix from the full adjacent matrix,
                                                     # the adjacent matrix are based on pairwise distance, 
                                                     # so we need not to construct it for each batch, we just use index to find the dynamic adjacent matrix  
-    return A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s     
+    return A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s,capacity     
 
 """
 Define the test error
@@ -119,7 +141,7 @@ def test_error(STmodel, unknow_set, test_data, A_s, Missing0):
     :test_data: The true value test_data of shape (test_num_timesteps, num_nodes)
     :A_s: The full adjacent matrix
     :Missing0: True: 0 in original datasets means missing data
-    :return: MAE, MAPE and RMSE
+    :return: NAE, MAPE and RMSE
     """  
     unknow_set = set(unknow_set)
     time_dim = STmodel.time_dimension
@@ -167,6 +189,7 @@ def test_error(STmodel, unknow_set, test_data, A_s, Missing0):
     MAPE = np.sum(np.abs(o - truth)/(truth + 1e-5))/np.sum( test_mask)
     
     return MAE, RMSE, MAPE
+
 
 def rolling_test_error(STmodel, unknow_set, test_data, A_s, Missing0):
     """
@@ -260,7 +283,7 @@ if __name__ == "__main__":
     batch_size = flags.batch_size
     to_plot = flags.to_plot
     # load dataset
-    A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s = load_data(dataset)
+    A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s,capacity = load_data(dataset)
     # Define model
     STmodel = IGNNK(h, z, K)  # The graph neural networks
 
@@ -279,13 +302,18 @@ if __name__ == "__main__":
             
             inputs = np.array(feed_batch)
             inputs_omask = np.ones(np.shape(inputs))
-
+            if not dataset == 'NREL': 
+                inputs_omask[inputs == 0] = 0           # We found that there are irregular 0 values for METR-LA, so we treat those 0 values as missing data,
+                                                        # For other datasets, it is not necessary to mask 0 values
+                                                    
             missing_index = np.ones((inputs.shape))
             for j in range(batch_size):
                 missing_mask = random.sample(range(0,n_o_n_m),n_m) #Masked locations
                 missing_index[j, :, missing_mask] = 0
-
-            Mf_inputs = inputs * inputs_omask * missing_index / E_maxvalue #normalize the value according to experience
+            if dataset == 'NREL':
+                Mf_inputs = inputs * inputs_omask * missing_index / capacities[:, None]
+            else:
+                Mf_inputs = inputs * inputs_omask * missing_index / E_maxvalue #normalize the value according to experience
             Mf_inputs = torch.from_numpy(Mf_inputs.astype('float32'))
             mask = torch.from_numpy(inputs_omask.astype('float32'))   #The reconstruction errors on irregular 0s are not used for training
             
@@ -293,7 +321,10 @@ if __name__ == "__main__":
             A_q = torch.from_numpy((calculate_random_walk_matrix(A_dynamic).T).astype('float32'))
             A_h = torch.from_numpy((calculate_random_walk_matrix(A_dynamic.T).T).astype('float32'))
             
-            outputs = torch.from_numpy(inputs/E_maxvalue) #The label
+            if dataset == 'NREL':
+                outputs = torch.from_numpy(inputs/capacities[:, None])
+            else:
+                outputs = torch.from_numpy(inputs/E_maxvalue) #The label
             
             optimizer.zero_grad()
             X_res = STmodel(Mf_inputs, A_q, A_h)  #Obtain the reconstruction

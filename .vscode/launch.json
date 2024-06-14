@@ -1,0 +1,16 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "IGNNK_train Debugger: IGNNK_train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/IGNNK_train.py",
+            "console": "integratedTerminal",
+            "args": ["metr", "--n_o", "150", "--h", "24", "--n_m", "50", "--n_u", "50", "--max_iter", "750"]
+        }
+    ]
+}
