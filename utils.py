@@ -69,10 +69,10 @@ def load_pems7_228_data():
     return A, X
 
 def load_pems7_1026_data():
-    X = pd.read_csv("data/PeMS7_228/PeMSD7_V_1026.csv", header=None).values
+    X = pd.read_csv("data/PeMS7_1026/PeMSD7_V_1026.csv", header=None).values
     X = X.transpose((1, 0))
     X = X.astype(np.float32)
-    A = pd.read_csv("data/PeMS7_228/PeMSD7_W_1026.csv", header=None).values
+    A = pd.read_csv("data/PeMS7_1026/PeMSD7_W_1026.csv", header=None).values
     A = (A - A.min()) / (A.max() - A.min())
     A = 1 - A
     A = A.astype(np.float32)
@@ -80,9 +80,9 @@ def load_pems7_1026_data():
     return A, X
 
 def load_seattle_data():
-    df_raw = pd.read_pickle('./dataset/Seattle/speed_matrix_2015') # (D*L_d, K)
+    df_raw = pd.read_pickle('data/Seattle/speed_matrix_2015') # (D*L_d, K)
     # the sensor id's in data_arr_df actually has duplicated sensor ids
-    location_info = pd.read_csv('./dataset/Seattle/Cabinet Location Information.csv')
+    location_info = pd.read_csv('data/Seattle/Cabinet Location Information.csv')
     distance_df = pd.DataFrame({'SensorName': [col[1:] for col in df_raw.columns]})
     dist_merged_df = pd.merge(distance_df, location_info[['CabName', 'Lat', 'Lon']], left_on='SensorName', right_on='CabName', how='left')
 
