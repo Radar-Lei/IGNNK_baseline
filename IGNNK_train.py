@@ -43,13 +43,13 @@ def parse_args(args):
         '--n_locations',type=int,default=207,
         help='the total number of locations'
     )
-    
+
     parser.add_argument(
         '--h',type=int,default=24,
         help='sampled time dimension'
     )
     parser.add_argument(
-        '--z',type=int,default=100,
+        '--z',type=int,default=128,
         help='hidden dimension for graph convolution'
     )
     parser.add_argument(
@@ -91,6 +91,9 @@ def load_data(dataset):
     if dataset == 'metr':
         A, X = load_metr_la_rdata()
         X = X[:,0,:]
+    elif dataset == 'pems7_228':
+        A, X = load_pems7_228_data()
+
     elif dataset == 'pems':
         A,X = load_pems_data()
     else:
@@ -249,12 +252,13 @@ if __name__ == "__main__":
     """
     flags = parse_args(sys.argv[1:])
     dataset=flags.dataset
-    n_o_n_m = flags.n_o
+    n_locations = flags.n_locations
+    n_u = int(n_locations * flags.missing_ratio)
+    n_m = n_u
+    n_o_n_m = int(n_locations * (1-flags.missing_ratio-0.05)) 
     h = flags.h
     z = flags.z
     K = flags.K
-    n_m = flags.n_m
-    n_u = flags.n_u
     max_iter = flags.max_iter
     learning_rate = flags.learning_rate
     E_maxvalue = flags.E_maxvalue
@@ -264,6 +268,7 @@ if __name__ == "__main__":
     # training_set shape: (num_timesteps, full_num_nodes)
 
     A,X,training_set,test_set,unknow_set,full_set,know_set,training_set_s,A_s,capacity = load_data(dataset)
+
     # Define model
     STmodel = IGNNK(h, z, K)  # The graph neural networks
 
@@ -316,10 +321,11 @@ if __name__ == "__main__":
             MAE_t, RMSE_t, MAPE_t = test_error(STmodel, unknow_set, test_set, A, True)
         else:
             MAE_t, RMSE_t, MAPE_t = test_error(STmodel, unknow_set, test_set, A, False)
+
         RMSE_list.append(RMSE_t)
         MAE_list.append(MAE_t)
         MAPE_list.append(MAPE_t)
-        print(epoch, MAE_t, RMSE_t, MAPE_t)
+        print("Epoch:{}, Test MAE:{}, RMSE:{}, MAPE:{}".format(epoch, MAE_t, RMSE_t, MAPE_t))
     
     if to_plot:
         plot_res(RMSE_list,dataset,training_set.shape[0]//(h * batch_size))

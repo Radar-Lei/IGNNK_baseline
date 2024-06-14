@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/IGNNK_train.py",
             "console": "integratedTerminal",
-            "args": ["metr", "--n_o", "150", "--h", "24", "--n_m", "50", "--n_u", "50", "--max_iter", "750"]
+            "args": ["pems7_228", "--missing_ratio", "0.3", "--h", "24", "--n_locations", "228", "--max_iter", "750"]
         }
     ]
 }

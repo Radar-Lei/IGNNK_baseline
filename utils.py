@@ -57,6 +57,17 @@ def load_metr_la_rdata():
 
     return A, X
 
+def load_pems7_228_data():
+    X = pd.read_csv("data/PeMS7_228/PeMSD7_V_228.csv", header=None).values
+    X = X.transpose((1, 0))
+    X = X.astype(np.float32)
+    A = pd.read_csv("data/PeMS7_228/PeMSD7_W_228.csv", header=None).values
+    A = (A - A.min()) / (A.max() - A.min())
+    A = 1 - A
+    A = A.astype(np.float32)
+
+    return A, X
+
 def generate_nerl_data():
     # %% Obtain all the file names
     filepath = 'data/nrel/al-pv-2006'
