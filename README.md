@@ -26,6 +26,9 @@ python IGNNK_train.py "seattle" --missing_ratio 0.6 --n_locations 323 --z 128 --
 python IGNNK_train.py "seattle" --missing_ratio 0.75 --n_locations 323 --z 128 --h 24 --max_iter 750
 ```
 
+Implementation
+![Implementation](/fig/implementation.gif)
+
 
 # The following is the original readme file
 # Inductive Graph Neural Networks for Spatiotemporal Kriging (IGNNK)

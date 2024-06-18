@@ -230,7 +230,7 @@ def plot_res(RMSE_list,dataset,time_batch):
     Draw Learning curves on testing error
     """    
     fig,ax = plt.subplots()
-    ax.plot(RMSE_list,label='RMSE_on_test_set',linewidth=3.5)
+    ax.plot(RMSE_list,label='RMSE_on_test_set',linewidth=2)
     ax.set_xlabel('Training Batch (x{:})'.format(time_batch),fontsize=20)
     ax.set_ylabel('RMSE',fontsize=20)
     ax.tick_params(axis="x", labelsize=14)
