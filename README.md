@@ -1,4 +1,8 @@
 # IGNNK baseline
+
+Implementation
+![Implementation](/fig/implementation.gif)
+
 This repository was forked from [IGNNK](https://github.com/Kaimaoge/IGNNK) and modified to work as one of the baselines for our study (Reference number: TRC-23-02333).
 
 First, you should download the data via [Google Drive](https://drive.google.com/drive/folders/14VPjNlQQRd5FCXXHrBPYbety9fiWx7--?usp=drive_link), and put each data set folder under the folder data/.
@@ -26,8 +30,6 @@ python IGNNK_train.py "seattle" --missing_ratio 0.6 --n_locations 323 --z 128 --
 python IGNNK_train.py "seattle" --missing_ratio 0.75 --n_locations 323 --z 128 --h 24 --max_iter 750
 ```
 
-Implementation
-![Implementation](/fig/implementation.gif)
 
 
 # The following is the original readme file
