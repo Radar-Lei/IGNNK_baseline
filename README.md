@@ -11,23 +11,23 @@ Then, you can test IGNNK on these data sets with varying missing ratio using the
 
 For the PeMS7_228 data set,
 ```bash
-python IGNNK_train.py "pems7_228" --missing_ratio 0.3 --n_locations 228 --z 128 --h 24 --max_iter 1500
-python IGNNK_train.py "pems7_228" --missing_ratio 0.6 --n_locations 228 --z 128 --h 24 --max_iter 1500
-python IGNNK_train.py "pems7_228" --missing_ratio 0.75 --n_locations 228 --z 128 --h 24 --max_iter 1500
+python IGNNK_train.py "pems7_I" --missing_ratio 0.1 --n_locations 228 --z 128 --h 24 --max_iter 1500
+python IGNNK_train.py "pems7_I" --missing_ratio 0.3 --n_locations 228 --z 128 --h 24 --max_iter 1500
+python IGNNK_train.py "pems7_I" --missing_ratio 0.6 --n_locations 228 --z 128 --h 24 --max_iter 1500
 ```
 
 For the PeMS7_1026 data set,
 ```bash
-python IGNNK_train.py "pems7_1026" --missing_ratio 0.3 --n_locations 1026 --z 128 --h 24 --batch_size 8 --max_iter 750
-python IGNNK_train.py "pems7_1026" --missing_ratio 0.6 --n_locations 1026 --z 128 --h 24 --batch_size 8 --max_iter 750
-python IGNNK_train.py "pems7_1026" --missing_ratio 0.75 --n_locations 1026 --z 128 --h 24 --batch_size 8 --max_iter 750
+python IGNNK_train.py "pems7_II" --missing_ratio 0.1 --n_locations 1026 --z 128 --h 24 --batch_size 8 --max_iter 750
+python IGNNK_train.py "pems7_II" --missing_ratio 0.3 --n_locations 1026 --z 128 --h 24 --batch_size 8 --max_iter 750
+python IGNNK_train.py "pems7_II" --missing_ratio 0.6 --n_locations 1026 --z 128 --h 24 --batch_size 8 --max_iter 750
 ```
 
 For the Seattle data set,
 ```bash
+python IGNNK_train.py "seattle" --missing_ratio 0.1 --n_locations 323 --z 128 --h 24 --max_iter 750
 python IGNNK_train.py "seattle" --missing_ratio 0.3 --n_locations 323 --z 128 --h 24 --max_iter 750
 python IGNNK_train.py "seattle" --missing_ratio 0.6 --n_locations 323 --z 128 --h 24 --max_iter 750
-python IGNNK_train.py "seattle" --missing_ratio 0.75 --n_locations 323 --z 128 --h 24 --max_iter 750
 ```
 
 
