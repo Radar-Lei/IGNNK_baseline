@@ -30,13 +30,13 @@ def parse_args(args):
 
     # Requird input parametrs
     parser.add_argument(
-        'dataset',type=str,default='pems7_228',
-        help = 'Name of the datasets, select from pems7_228, pems7_1026, seattle'
+        'dataset',type=str,default='pems7_I',
+        help = 'Name of the datasets, select from pems7_I, pems7_II, seattle'
     )
     
     # optional input parameters
     parser.add_argument(
-        '--missing_ratio',type=float,default=0.3,
+        '--missing_ratio',type=float,default=0.1,
         help='missing_ratio'
     )
     parser.add_argument(
@@ -88,9 +88,9 @@ def load_data(dataset):
     capacity: only works for NREL, each station's capacity
     '''
     capacity = []
-    if dataset == 'pems7_228':
+    if dataset == 'pems7_I':
         A, X = load_pems7_228_data()
-    elif dataset == 'pems7_1026':
+    elif dataset == 'pems7_II':
         A, X = load_pems7_1026_data()
     elif dataset == 'seattle':
         A, X = load_seattle_data()
