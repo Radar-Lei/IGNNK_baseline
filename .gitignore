@@ -1,0 +1,7 @@
+__pycache__/
+data/PeMS7_228/
+data/PeMS7_1026/
+data/Seattle/
+model/
+.vscode/
+.DS_Store
